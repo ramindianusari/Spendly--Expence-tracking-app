@@ -1,0 +1,27 @@
+# Environment-specific files
+config/db.local.php
+
+# XAMPP / OS artifacts
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE folders
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# PHP composer (not used yet, but reserve)
+vendor/
+composer.lock
+
+# Logs
+*.log
+error_log
+
+# Uploaded user files (future feature)
+uploads/
+
+# Node (if used for tooling)
+node_modules/
