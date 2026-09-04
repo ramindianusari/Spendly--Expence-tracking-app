@@ -1,4 +1,5 @@
-# Environment-specific files
+# Environment-specific files — never commit real secrets
+.env
 config/db.local.php
 
 # XAMPP / OS artifacts

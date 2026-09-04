@@ -1,7 +1,6 @@
--- ============================================================
+
 -- Expense Tracker — Database Schema
 -- Run this in phpMyAdmin or MySQL CLI before starting the app
--- ============================================================
 
 CREATE DATABASE IF NOT EXISTS expense_tracker
     CHARACTER SET utf8mb4
@@ -32,9 +31,9 @@ CREATE TABLE IF NOT EXISTS transactions (
     INDEX idx_user_date (user_id, txn_date)
 ) ENGINE=InnoDB;
 
--- ============================================================
+
 -- Demo seed data  (password = "password123" → bcrypt)
--- ============================================================
+
 INSERT IGNORE INTO users (name, email, password) VALUES
 (
     'Rahul',

@@ -1,20 +1,21 @@
 # Expense Tracker 💰
 
-A personal finance web app built with **PHP**, **MySQL**, **HTML/CSS/JS**, and **Chart.js**.
-Track your income and expenses, view your balance, and analyse spending trends.
+A personal finance web app — track income, expenses, and view your balance.
+Built with **PHP 8**, **MySQL 8**, **HTML/CSS/JS**, and **Chart.js**.
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Layer       | Technology        |
-|-------------|-------------------|
-| Frontend    | HTML5, CSS3, JavaScript (ES6+) |
-| Backend     | PHP 8.x           |
-| Database    | MySQL 8.x         |
-| Charts      | Chart.js          |
-| Local dev   | XAMPP             |
-| Version control | Git + GitHub  |
+| Layer        | Technology               |
+|--------------|--------------------------|
+| Frontend     | HTML5, CSS3, JavaScript (ES6+) |
+| Backend      | PHP 8.2 + Apache         |
+| Database     | MySQL 8.0 (Docker)       |
+| Charts       | Chart.js                 |
+| Dev env      | Docker + Docker Compose  |
+| DB GUI       | DBeaver                  |
+| Version ctrl | Git + GitHub             |
 
 ---
 
@@ -22,64 +23,123 @@ Track your income and expenses, view your balance, and analyse spending trends.
 
 ```
 expense-tracker/
-├── index.php           # Login page
-├── home.php            # Dashboard / Home page
-├── register.php        # New user registration
-├── logout.php          # Session logout handler
+├── index.php              # Login page
+├── home.php               # Dashboard / Home page
+├── register.php           # New user registration
+├── logout.php             # Session logout handler
 ├── config/
-│   └── db.php          # PDO database connection
+│   └── db.php             # PDO connection (reads Docker env vars)
 ├── includes/
-│   └── auth.php        # Session helpers & utilities
+│   └── auth.php           # Session helpers & utilities
 ├── css/
-│   └── style.css       # Global dark-theme styles
+│   └── style.css          # Global dark-theme styles
 ├── js/
-│   └── main.js         # Frontend JS (validation, animations)
-├── database.sql        # DB schema + seed data
+│   └── main.js            # Frontend JS
+├── database.sql           # MySQL schema + seed data (auto-imported)
+├── Dockerfile             # PHP 8.2 + Apache image
+├── docker-compose.yml     # App + DB services
+├── .env.example           # Environment variable template
 └── README.md
 ```
 
 ---
 
-## 🚀 Getting Started (XAMPP)
+## 🚀 Getting Started (Docker + DBeaver)
+
+### Prerequisites
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running
+- [DBeaver Community](https://dbeaver.io/download/) installed
+
+---
 
 ### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/<your-username>/expense-tracker.git
+cd expense-tracker
 ```
 
-### 2. Place in XAMPP htdocs
+### 2. Create your `.env` file
 
-```
-C:\xampp\htdocs\expense-tracker\
-```
-
-### 3. Create the Database
-
-1. Start **Apache** and **MySQL** from the XAMPP Control Panel.
-2. Open [http://localhost/phpmyadmin](http://localhost/phpmyadmin).
-3. Click **New** → name it `expense_tracker` → **Create**.
-4. Select the database, click **Import**, and upload `database.sql`.
-
-### 4. Configure DB Credentials (if needed)
-
-Edit `config/db.php`:
-
-```php
-define('DB_USER', 'root');   // your MySQL username
-define('DB_PASS', '');        // your MySQL password (blank by default in XAMPP)
+```bash
+# Windows PowerShell
+Copy-Item .env.example .env
 ```
 
-### 5. Open the App
+Edit `.env` if you want custom passwords (defaults work fine for local dev):
 
-Visit [http://localhost/expense-tracker](http://localhost/expense-tracker)
+```env
+MYSQL_ROOT_PASSWORD=rootpassword
+MYSQL_DATABASE=expense_tracker
+MYSQL_USER=expense_user
+MYSQL_PASSWORD=expense_pass
+```
 
-**Demo credentials (from seed data):**
+### 3. Start the containers
 
-| Field    | Value                  |
-|----------|------------------------|
-| Email    | rahul@example.com      |
-| Password | password123            |
+```bash
+docker compose up -d
+```
+
+This spins up two containers:
+
+| Container | What it runs | Port |
+|-----------|-------------|------|
+| `expense_tracker_app` | PHP 8.2 + Apache | `localhost:8080` |
+| `expense_tracker_db`  | MySQL 8.0 | `localhost:3306` |
+
+> The `database.sql` schema + seed data is **automatically imported** on first run.
+
+### 4. Open the App
+
+👉 [http://localhost:8080](http://localhost:8080)
+
+**Demo credentials:**
+
+| Field    | Value               |
+|----------|---------------------|
+| Email    | rahul@example.com   |
+| Password | password123         |
+
+---
+
+## 🗄️ Connect DBeaver to MySQL
+
+1. Open DBeaver → **New Database Connection** → choose **MySQL**
+2. Fill in:
+
+| Field    | Value          |
+|----------|----------------|
+| Host     | `localhost`    |
+| Port     | `3306`         |
+| Database | `expense_tracker` |
+| Username | `expense_user` |
+| Password | `expense_pass` |
+
+3. Click **Test Connection** → **Finish**
+
+> You can now browse tables, run queries, and view your data visually in DBeaver.
+
+---
+
+## 🐳 Useful Docker Commands
+
+```bash
+# Start containers (detached)
+docker compose up -d
+
+# Stop containers
+docker compose down
+
+# View live logs
+docker compose logs -f
+
+# Rebuild after code changes to Dockerfile
+docker compose up -d --build
+
+# Remove containers AND wipe the database volume (fresh start)
+docker compose down -v
+```
 
 ---
 
@@ -87,12 +147,13 @@ Visit [http://localhost/expense-tracker](http://localhost/expense-tracker)
 
 - [x] User registration & login (bcrypt passwords)
 - [x] Session-based authentication
-- [x] Dashboard with total balance, income & expense summary
+- [x] Dashboard — balance, income & expense totals
 - [x] Recent transactions list with category icons
-- [x] Responsive mobile-first UI (dark theme)
+- [x] Responsive mobile-first UI (dark theme, green accent)
 - [x] Time-aware greeting (Good morning / afternoon / evening)
-- [x] Client-side form validation + server-side validation
 - [x] Balance counter animation on page load
+- [x] Docker Compose setup (MySQL + PHP/Apache)
+- [x] DBeaver-ready MySQL on `localhost:3306`
 
 ## 🗺️ Roadmap
 
@@ -100,14 +161,6 @@ Visit [http://localhost/expense-tracker](http://localhost/expense-tracker)
 - [ ] Reports page with Chart.js pie & bar charts
 - [ ] Filter transactions by date / category
 - [ ] Export to CSV
-
----
-
-## 📸 Screenshots
-
-| Login | Dashboard |
-|-------|-----------|
-| ![Login](assets/screenshots/login.png) | ![Home](assets/screenshots/home.png) |
 
 ---
 
