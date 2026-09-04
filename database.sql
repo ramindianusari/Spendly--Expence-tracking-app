@@ -34,11 +34,12 @@ CREATE TABLE IF NOT EXISTS transactions (
 
 -- Demo seed data  (password = "password123" → bcrypt)
 
+-- Demo password: password123
 INSERT IGNORE INTO users (name, email, password) VALUES
 (
     'Rahul',
     'rahul@example.com',
-    '$2y$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'
+    '$2y$12$CkKFZiKgYFgxpZyUxFrNC.BMcJhdEfOfYtk9IVYXjoWjqqfeKpp2a'
 );
 
 -- Seed transactions for user id = 1
