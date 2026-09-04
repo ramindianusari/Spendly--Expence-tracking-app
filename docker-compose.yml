@@ -1,7 +1,7 @@
 # ============================================================
 # Expense Tracker — Docker Compose
-# Services: app (PHP/Apache) + db (MySQL 8)
-# DBeaver connects to localhost:3306
+# Uses your EXISTING MySQL container on localhost:3306
+# App runs on http://localhost:8080
 # ============================================================
 
 services:
@@ -12,42 +12,14 @@ services:
     container_name: expense_tracker_app
     restart: unless-stopped
     ports:
-      - "8080:80"        # Visit http://localhost:8080
+      - "8080:80"
     volumes:
-      - .:/var/www/html  # Live reload: edits reflect instantly
+      - .:/var/www/html
     environment:
-      DB_HOST: db
+      DB_HOST: host.docker.internal   # reaches your existing MySQL on localhost:3306
       DB_PORT: "3306"
-      DB_NAME: ${MYSQL_DATABASE:-expense_tracker}
-      DB_USER: ${MYSQL_USER:-expense_user}
-      DB_PASS: ${MYSQL_PASSWORD:-expense_pass}
-    depends_on:
-      db:
-        condition: service_healthy
-
-  # ── MySQL 8 ───────────────────────────────────────────────
-  db:
-    image: mysql:8.0
-    container_name: expense_tracker_db
-    restart: unless-stopped
-    ports:
-      - "3306:3306"      # DBeaver connects here: localhost:3306
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
-      MYSQL_DATABASE:      ${MYSQL_DATABASE:-expense_tracker}
-      MYSQL_USER:          ${MYSQL_USER:-expense_user}
-      MYSQL_PASSWORD:      ${MYSQL_PASSWORD:-expense_pass}
-    volumes:
-      - db_data:/var/lib/mysql
-      - ./database.sql:/docker-entrypoint-initdb.d/init.sql:ro
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost",
-             "-u", "root", "--password=${MYSQL_ROOT_PASSWORD:-rootpassword}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-
-volumes:
-  db_data:
-    driver: local
+      DB_NAME: expense_tracker
+      DB_USER: root
+      DB_PASS: root
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # required on Linux; no-op on Docker Desktop
