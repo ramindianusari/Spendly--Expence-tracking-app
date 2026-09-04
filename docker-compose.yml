@@ -1,12 +1,13 @@
 # ============================================================
 # Expense Tracker — Docker Compose
-# Uses your EXISTING MySQL container on localhost:3306
-# App runs on http://localhost:8080
+# Services: app (PHP/Apache) + db (MySQL 8 with persistent volume)
+# App  → http://localhost:8080
+# DB   → localhost:3307  (DBeaver connects here)
 # ============================================================
 
 services:
 
-  # ── PHP + Apache app ─────────────────────────────────────
+  # ── PHP + Apache ──────────────────────────────────────────
   app:
     build: .
     container_name: expense_tracker_app
@@ -14,12 +15,40 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - .:/var/www/html
+      - .:/var/www/html        # Live reload
     environment:
-      DB_HOST: host.docker.internal   # reaches your existing MySQL on localhost:3306
+      DB_HOST: db              # Internal Docker network name
       DB_PORT: "3306"
       DB_NAME: expense_tracker
-      DB_USER: root
-      DB_PASS: root
-    extra_hosts:
-      - "host.docker.internal:host-gateway"  # required on Linux; no-op on Docker Desktop
+      DB_USER: expense_user
+      DB_PASS: expense_pass
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ── MySQL 8 with persistent volume ────────────────────────
+  db:
+    image: mysql:8.0
+    container_name: expense_tracker_db
+    restart: unless-stopped
+    ports:
+      - "3307:3306"            # 3307 avoids clash with your existing MySQL on 3306
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE:      expense_tracker
+      MYSQL_USER:          expense_user
+      MYSQL_PASSWORD:      expense_pass
+    volumes:
+      - db_data:/var/lib/mysql                               # ← persists data forever
+      - ./database.sql:/docker-entrypoint-initdb.d/init.sql:ro  # auto-import on first run
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "--password=rootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+# Named volume — survives container restarts and rebuilds
+volumes:
+  db_data:
+    driver: local
