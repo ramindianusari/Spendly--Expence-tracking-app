@@ -85,7 +85,7 @@
         // Ease-out cubic
         const eased    = 1 - Math.pow(1 - progress, 3);
         const current  = Math.round(eased * target);
-        balanceEl.textContent = 'Rs. ' + current.toLocaleString('en-IN');
+        balanceEl.textContent = 'Rs. ' + current.toLocaleString('en-LK');
         if (progress < 1) requestAnimationFrame(step);
     }
 

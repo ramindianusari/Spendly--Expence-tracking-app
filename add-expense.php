@@ -99,7 +99,7 @@ $postedNote       = $_POST['note']     ?? '';
 
             <!-- Amount -->
             <div class="form-group">
-                <label class="form-label" for="amount">AMOUNT (₹)</label>
+                <label class="form-label" for="amount">AMOUNT (Rs.)</label>
                 <input
                     class="form-input amount-input"
                     type="number"
